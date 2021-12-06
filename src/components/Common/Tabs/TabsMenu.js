@@ -10,19 +10,19 @@ export const TabsMenu = ({
     <Menu size="medium" onClick={(e) => e.domEvent.stopPropagation()}>
       {editable && !virtual && (
         <Menu.Item onClick={() => onClick("edit")}>
-          Rename
+          重命名
         </Menu.Item>
       )}
 
       {!virtual && (
         <Menu.Item onClick={() => onClick("duplicate")}>
-        Duplicate
+        复制
         </Menu.Item>
       )}
 
       {virtual && (
         <Menu.Item onClick={() => onClick("save")}>
-            Save
+            保存
         </Menu.Item>
       )}
 
@@ -30,7 +30,7 @@ export const TabsMenu = ({
         <>
           {!virtual && <Menu.Divider />}
           <Menu.Item onClick={() => onClick("close")}>
-            Close
+            关闭
           </Menu.Item>
         </>
       ) : null}

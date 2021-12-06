@@ -143,7 +143,7 @@ export const Tab = types
           type: el.filter.currentType,
         };
 
-        console.log({ filterItem });
+        console.log('改变条件', { filterItem });
 
         filterItem.value = normalizeFilterValue(
           filterItem.type,

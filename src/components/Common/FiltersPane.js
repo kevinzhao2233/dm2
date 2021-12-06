@@ -27,7 +27,7 @@ export const FiltersButton = buttonInjector(observer(
         onClick={() => sidebarEnabled && viewsStore.toggleSidebar()}
         {...rest}
       >
-        Filters {hasFilters && (
+        过滤 {hasFilters && (
           <Badge size="small" style={{ marginLeft: 5 }}>{activeFiltersNumber}</Badge>
         )}
         <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />

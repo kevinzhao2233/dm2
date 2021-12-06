@@ -15,8 +15,8 @@ const Conjunction = observer(({ index, view }) => {
   return (
     <FilterDropdown
       items={[
-        { value: "and", label: "And" },
-        { value: "or", label: "Or" },
+        { value: "and", label: "与" },
+        { value: "or", label: "或" },
       ]}
       disabled={index > 1}
       value={view.conjunction}
@@ -43,14 +43,14 @@ export const FilterLine = observer(({
       <GroupWrapper wrap={sidebar}>
         <Elem name="column" mix="conjunction">
           {index === 0 ? (
-            <span style={{ fontSize: 12, paddingRight: 5 }}>Where</span>
+            <span style={{ fontSize: 12, paddingRight: 5 }}>当</span>
           ) : (
             <Conjunction index={index} view={view} />
           )}
         </Elem>
         <Elem name="column" mix="field">
           <FilterDropdown
-            placeholder="Column"
+            placeholder="列"
             defaultValue={filter.filter.id}
             items={availableFilters}
             width={80}

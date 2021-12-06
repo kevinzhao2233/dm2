@@ -44,8 +44,8 @@ export const createApp = async (rootNode, datamanager) => {
   if ((!response || response.error)) {
     const message = `
       ${response?.error ?? ""}
-      LS API not available; check \`API_GATEWAY\` and \`LS_ACCESS_TOKEN\` env vars;
-      also check \`data-project-id\` in \`public/index.html\`
+      Label Studio 的 API 不可用; 检查 \`API_GATEWAY\` 和 \`LS_ACCESS_TOKEN\` 环境变量;
+      检查 \`data-project-id\` 是否在 \`public/index.html\`
     `;
 
     throw new Error(message);

@@ -46,7 +46,7 @@ export const initDevApp = async (DataManager) => {
     },
     instruments: {
       'review-button': () => {
-        return () => <Button style={{ width: 105 }}>Review</Button>;
+        return () => <Button style={{ width: 105 }}>审查</Button>;
       },
     },
   });

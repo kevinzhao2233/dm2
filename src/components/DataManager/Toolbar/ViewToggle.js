@@ -15,13 +15,13 @@ export const ViewToggle = viewInjector(observer(({ view, size, ...rest }) => {
       {...rest}
     >
       <RadioGroup.Button value="list">
-        <Tooltip title="List view">
-          <span>List</span>
+        <Tooltip title="列表视图">
+          <span>列表</span>
         </Tooltip>
       </RadioGroup.Button>
       <RadioGroup.Button value="grid">
-        <Tooltip title="Grid view">
-          <span>Grid</span>
+        <Tooltip title="卡片试图">
+          <span>卡片</span>
         </Tooltip>
       </RadioGroup.Button>
     </RadioGroup>

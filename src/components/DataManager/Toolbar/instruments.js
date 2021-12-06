@@ -24,7 +24,7 @@ export const instruments = {
       <FieldsButton
         wrapper={FieldsButton.Checkbox}
         trailingIcon={<Icon icon={FaCaretDown} />}
-        title={"Columns"}
+        title={"列"}
         size={size}
         style={style}
       />
@@ -57,14 +57,14 @@ export const instruments = {
   'import-button': ({ size }) => {
     return (
       <Interface name="import">
-        <ImportButton size={size}>Import</ImportButton>
+        <ImportButton size={size}>导入</ImportButton>
       </Interface>
     );
   },
   'export-button': ({ size }) => {
     return (
       <Interface name="export">
-        <ExportButton size={size}>Export</ExportButton>
+        <ExportButton size={size}>导出</ExportButton>
       </Interface>
     );
   },

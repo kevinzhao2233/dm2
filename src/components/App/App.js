@@ -37,9 +37,9 @@ const AppComponent = ({ app }) => {
           <Block name="root" mod={{ mode: app.SDK.mode }}>
             {app.crashed ? (
               <Block name="crash">
-                <Elem name="header">Oops...</Elem>
+                <Elem name="header">糟糕...</Elem>
                 <Elem name="description">
-                  Project has been deleted or not yet created.
+                  项目被删除或者还未创建
                 </Elem>
               </Block>
             ) : app.loading ? (

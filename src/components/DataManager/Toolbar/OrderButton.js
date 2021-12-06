@@ -16,15 +16,15 @@ const injector = inject(({ store }) => {
 export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
   return (
     <Space style={{ fontSize: 12 }}>
-      Order
+      排序
       <Button.Group collapsed {...rest} >
         <FieldsButton
           size={size}
           style={{ minWidth: 67, textAlign: "left", marginRight: -1 }}
-          title={ordering ? ordering.column?.title : "not set"}
+          title={ordering ? ordering.column?.title : "未设置"}
           onClick={(col) => view.setOrdering(col.id)}
           onReset={() => view.setOrdering(null)}
-          resetTitle="Default"
+          resetTitle="默认"
           selected={ordering?.field}
           wrapper={({ column, children }) => (
             <Space style={{ width: "100%", justifyContent: "space-between" }}>

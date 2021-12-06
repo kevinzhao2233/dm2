@@ -185,7 +185,7 @@ export const TabStore = types
 
       const snapshot = viewSnapshot ?? {};
       const lastView = self.views[self.views.length - 1];
-      const newTitle = snapshot.title ?? `New Tab ${self.views.length + 1}`;
+      const newTitle = snapshot.title ?? `新标签 ${self.views.length + 1}`;
       const newID = snapshot.id ?? (lastView?.id ? lastView.id + 1 : 0);
 
       const defaultHiddenColumns = self.defaultHidden ? clone(self.defaultHidden) : {
@@ -240,7 +240,7 @@ export const TabStore = types
     createDefaultView: flow(function*() {
       self.views.push({
         id: 0,
-        title: "Default",
+        title: "默认",
         hiddenColumns: self.defaultHidden,
       });
 
@@ -305,7 +305,7 @@ export const TabStore = types
 
         return newView;
       } else {
-        console.log('saved');
+        console.log('已保存过滤项');
         applySnapshot(view, newViewSnapshot);
 
         if (reload !== false) {

@@ -21,7 +21,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
             onClick={onClick}
             style={{ fontSize: 18, padding: 0, color: "black" }}
           >
-            Back
+            返回
           </Button>
         )}
 
@@ -30,7 +30,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
             wrapper={FieldsButton.Checkbox}
             icon={<Icon icon={FaColumns} />}
             trailingIcon={<Icon icon={FaCaretDown} />}
-            title={"Fields"}
+            title={"过滤"}
           />
         ) : null}
       </Space>

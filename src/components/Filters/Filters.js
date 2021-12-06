@@ -66,7 +66,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
             />
           ))
         ) : (
-          <Elem name="empty">No filters applied</Elem>
+          <Elem name="empty">没有过滤项</Elem>
         )}
       </Elem>
       <Elem name="actions">
@@ -76,7 +76,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
           onClick={() => currentView.createFilter()}
           icon={<FaPlus />}
         >
-          Add {filters.length ? "Another Filter" : "Filter"}
+          添加{filters.length ? "其他过滤项" : "过滤项目"}
         </Button>
 
         {!sidebarEnabled ? (

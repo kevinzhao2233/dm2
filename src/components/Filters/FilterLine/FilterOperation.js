@@ -36,7 +36,7 @@ export const FilterOperation = observer(
     }, [operator, types, filter]);
 
     const saveFilter = useCallback(debounce(() => {
-      console.log('changed', filter.id);
+      console.log('改变值', filter.id);
       filter.save(true);
     }, 300), [filter]);
 

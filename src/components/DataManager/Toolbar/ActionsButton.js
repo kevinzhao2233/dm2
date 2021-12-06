@@ -44,7 +44,7 @@ export const ActionsButton = injector(observer(({ store, size, hasSelected, ...r
       const dialog = Modal[dialogType] ?? Modal.confirm;
 
       dialog({
-        title: destructive ? "Destructive action." : "Confirm action.",
+        title: destructive ? "破坏性行为" : "确认操作",
         body: buildDialogContent(text, form, formRef),
         buttonLook: destructive ? "destructive" : "primary",
         onOk() {

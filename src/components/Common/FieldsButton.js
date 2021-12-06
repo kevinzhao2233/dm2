@@ -31,7 +31,7 @@ const FieldsMenu = observer(
           MenuItem(
             {
               key: "none",
-              title: resetTitle ?? "Default",
+              title: resetTitle ?? "默认",
               wrap: false,
             },
             onReset,
