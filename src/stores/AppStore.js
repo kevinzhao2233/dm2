@@ -277,16 +277,18 @@ export const AppStore = types
       }
     },
 
+    // 检查是否有标记配置
     confirmLabelingConfigured() {
       if (!self.labelingIsConfigured) {
         Modal.confirm({
-          title: "You're almost there!",
+          title: "马上就好了",
           body:
-            "Before you can annotate the data, set up labeling configuration",
+            "标注数据之前, 需要创建一些配置",
           onOk() {
             self.SDK.invoke("settingsClicked");
           },
-          okText: "Go to setup",
+          okText: "去配置",
+          cancelText: "取消",
         });
         return false;
       } else {
@@ -444,13 +446,13 @@ export const AppStore = types
       if (result.error && result.status !== 404) {
         if (result.response) {
           self.serverError.set(methodName, {
-            error: "Something went wrong",
+            error: "服务器出现错误",
             response: result.response,
           });
         }
 
         console.warn({
-          message: "Error occurred when loading data",
+          message: "加载数据时出错",
           description: result?.response?.detail ?? result.error,
         });
 

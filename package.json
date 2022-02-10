@@ -25,8 +25,10 @@
     "build:module-dev": "BUILD_NO_MINIMIZATION=true BUILD_NO_HASH=true BUILD_NO_CHUNKS=true BUILD_MODULE=true npm run build",
     "prettier-styles": "prettier --write src/**/*.scss",
     "prettier": "prettier --write src/**/*.js",
-    "build": "npx webpack",
+    "copy-dist" : "copy-dist.sh",
+    "build": "npx webpack && copy-dist.sh",
     "watch": "npx webpack --watch",
+    "dev": "node dev-server.js",
     "start": "node dev-server.js",
     "test": "echo \"Error: no test specified\" && exit 0"
   },
