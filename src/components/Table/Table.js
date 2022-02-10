@@ -110,6 +110,7 @@ export const DataView = injector(
       view,
     ]);
 
+    // 点击行，打开新页面？
     const onRowClick = useCallback(
       (item, e) => {
         if (e.metaKey || e.ctrlKey) {
@@ -121,6 +122,7 @@ export const DataView = injector(
       [view],
     );
 
+    // 渲染表格内容
     const renderContent = useCallback(
       (content) => {
         if (isLoading && total === 0 && !isLabeling) {
@@ -135,17 +137,17 @@ export const DataView = injector(
               <Elem name="description">
                 {hasData ? (
                   <>
-                    <h3>Nothing found</h3>
-                    Try adjusting the filter
+                    <h3>没有数据</h3>
+                    请尝试修改过滤条件
                   </>
                 ) : (
-                  "Looks like you have not imported any data yet"
+                  "你还没有导入任何数据"
                 )}
               </Elem>
               {!hasData && (
                 <Elem name="navigation">
                   <ImportButton look="primary" href="./import">
-                    Go to import
+                    导入数据
                   </ImportButton>
                 </Elem>
               )}

@@ -39,25 +39,24 @@ const switchInjector = inject(({ store }) => {
   };
 });
 
+// 右上角展示数据的部分
 const ProjectSummary = summaryInjector((props) => {
   return (
     <Space size="large" style={{ paddingRight: "1em", color: "rgba(0,0,0,0.3)" }}>
       {props.cloudSync && (
         <Space
           size="small"
-          style={{ fontSize: 12, fontWeight: 400, opacity: 0.8 }}
+          style={{ fontSize: 12, fontWeight: 400, opacity: 0.9 }}
         >
-          Storage sync
+          同步数据...
           <Spinner size="small" />
         </Space>
       )}
       <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
-        <Space size="compact">
-          <span>
-            Tasks: {props.totalFoundTasks} / {props.totalTasks}
-          </span>
-          <span>Annotations: {props.totalAnnotations}</span>
-          <span>Predictions: {props.totalPredictions}</span>
+        <Space size="compact" style={{ gridGap: '8px' }}>
+          <span>任务: {props.totalFoundTasks} / {props.totalTasks}</span>
+          <span>标注: {props.totalAnnotations}</span>
+          <span>预测: {props.totalPredictions}</span>
         </Space>
       </span>
     </Space>

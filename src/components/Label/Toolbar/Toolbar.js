@@ -39,7 +39,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
           <div style={{ display: "flex", alignItems: "center" }}>
             <History history={history}>
               <div style={{ margin: history ? "0 10px" : 0 }}>
-                Task #{task.id}
+                任务 #{task.id}
               </div>
             </History>
           </div>
@@ -62,7 +62,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
           <Elem name="tools">
             <Space>
               {hasInstruction && (
-                <Tooltip title="Labeling Instructions">
+                <Tooltip title="标注说明">
                   <Button
                     look={lsf.showingDescription ? "primary" : "dashed"}
                     icon={<Icon icon={FaInfoCircle} />}
@@ -71,7 +71,7 @@ export const Toolbar = observer(({ view, history, lsf, isLabelStream, hasInstruc
                 </Tooltip>
               )}
 
-              <Tooltip title="Settings">
+              <Tooltip title="设置">
                 <Button
                   look="dashed"
                   icon={<Icon icon={FaCog} />}
@@ -145,7 +145,7 @@ const SubmissionButtons = observer(
           disabled={disabled}
           icon={<Icon icon={FaBan} />}
         >
-          Skip
+          跳过
         </Button>
       </Tooltip>,
     );
@@ -162,7 +162,7 @@ const SubmissionButtons = observer(
           icon={<Icon icon={isNewTask ? FaCheck : FaCheckCircle} />}
           onClick={saveAnnotation}
         >
-          {isNewTask || isLabelStream ? "Submit" : "Update"}
+          {isNewTask || isLabelStream ? "提交" : "更新"}
         </Button>
       </Tooltip>,
     );

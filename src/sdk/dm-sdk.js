@@ -172,7 +172,7 @@ export class DataManager {
     if (config.actions) {
       config.actions.forEach(([action, callback]) => {
         if (!isDefined(action.id)) {
-          throw new Error("Every action must provide a unique ID");
+          throw new Error("每个操作都必须提供唯一的标识");
         }
         this.actions.set(action.id, { action, callback });
       });
@@ -458,7 +458,7 @@ export class DataManager {
         const customInstrument = !!this.instruments.has(instrument);
 
         if (!nativeInstrument && !customInstrument) {
-          console.warn(`Unknwown instrument detected: ${instrument}. Did you forget to register it?`);
+          console.warn(`未检查到工具: ${instrument}. 是否忘记注册了?`);
         }
 
         return nativeInstrument || customInstrument;

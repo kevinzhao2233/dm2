@@ -10,6 +10,7 @@ import { Space } from "../Common/Space/Space";
 import { DataView } from "../Table/Table";
 import "./Label.styl";
 
+// 标注界面的头部
 const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
   return (
     <Elem name="header" mod={{ labelStream: !isExplorerMode }}>
@@ -125,6 +126,7 @@ export const Labeling = injector(
             </Elem>
           )}
 
+          {/* lsf 容器 */}
           <Elem name="lsf-wrapper" mod={{ mode: isExplorerMode ? "explorer" : "labeling" }}>
             <Elem
               ref={lsfRef}

@@ -12,6 +12,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 const TabsContext = createContext();
 
+// Tab 栏
 export const Tabs = ({
   children,
   activeTab,
@@ -57,6 +58,7 @@ export const Tabs = ({
   );
 };
 
+// Tab 栏的单个 Tab
 export const TabsItem = ({
   title,
   tab,

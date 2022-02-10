@@ -29,7 +29,7 @@ export const FiltersSidebar = sidebarInjector(
               onClick={() => viewsStore.collapseFilters()}
             />
           </Elem>
-          <Elem name="title">Filters</Elem>
+          <Elem name="title">过滤</Elem>
         </Elem>
         <Filters sidebar={true} />
       </Block>

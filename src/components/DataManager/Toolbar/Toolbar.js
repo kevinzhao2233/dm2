@@ -10,6 +10,7 @@ const injector = inject(({ store }) => {
   };
 });
 
+// 过滤条件、标记按钮、视图切换等等
 export const Toolbar = injector(observer(({ store }) => {
   return (
     <Block name="tab-panel">
@@ -32,4 +33,3 @@ export const Toolbar = injector(observer(({ store }) => {
     </Block>
   );
 }));
-

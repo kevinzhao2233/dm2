@@ -80,7 +80,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
         </Button>
 
         {!sidebarEnabled ? (
-          <Tooltip title="Pin to sidebar">
+          <Tooltip title="固定到侧边栏">
             <Button
               type="link"
               size="small"
