@@ -51,6 +51,7 @@ const injector = inject(({ store }) => {
 export const Labeling = injector(
   ({ store }) => {
     const lsfRef = useRef();
+    // 这里的 SDK 是 dm-sdk，也就是 class DataManager 的实例对象
     const SDK = store?.SDK;
     const view = store?.currentView;
     const { isExplorerMode } = store;
@@ -79,6 +80,7 @@ export const Labeling = injector(
       };
     }, []);
 
+    // 初始化和卸载 LSF
     useEffect(() => {
       if (isLabelStream) {
         SDK.initLSF(lsfRef.current);

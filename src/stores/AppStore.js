@@ -277,7 +277,7 @@ export const AppStore = types
       }
     },
 
-    // 检查是否有标记配置
+    // 检查是否有标记配置，比如模板、标签等等
     confirmLabelingConfigured() {
       if (!self.labelingIsConfigured) {
         Modal.confirm({

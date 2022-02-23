@@ -3,6 +3,7 @@ import { APIAnnotation, APIPrediction, APITask, LSFAnnotation, LSFTaskData } fro
 /**
  * Converts the task from the server format to the
  * format supported by the LS frontend
+ * 将任务从服务器格式转换为 LS 前端支持的格式
  * @param {import("../stores/Tasks").TaskModel} task
  * @private
  */

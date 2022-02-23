@@ -138,7 +138,7 @@ export const create = (columns) => {
     .actions((self) => ({
       loadTask: flow(function* (taskID, { select = true } = {}) {
         if (!isDefined(taskID)) {
-          console.warn("Task ID must be provided");
+          console.warn("必须提供任务 ID ");
           return;
         }
 

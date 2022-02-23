@@ -76,6 +76,7 @@ export class LSFWrapper {
   constructor(dm, element, options) {
     this.datamanager = dm;
     this.root = element;
+    this.projectId = options.projectId;
     this.task = options.task;
     this.labelStream = options.isLabelStream ?? false;
     this.initialAnnotation = options.annotation;
@@ -124,6 +125,7 @@ export class LSFWrapper {
     const lsfProperties = {
       user: options.user,
       config: this.lsfConfig,
+      projectId: this.projectId,
       task: taskToLSFormat(this.task),
       description: this.instruction,
       interfaces,
@@ -135,6 +137,7 @@ export class LSFWrapper {
       onSubmitDraft: this.onSubmitDraft,
       onLabelStudioLoad: this.onLabelStudioLoad,
       onTaskLoad: this.onTaskLoad,
+      onProjectFetch: this.onProjectFetch,
       onStorageInitialized: this.onStorageInitialized,
       onSubmitAnnotation: this.onSubmitAnnotation,
       onUpdateAnnotation: this.onUpdateAnnotation,
@@ -159,6 +162,7 @@ export class LSFWrapper {
       const LSF = await resolveLabelStudio();
 
       this.globalLSF = window.LabelStudio === LSF;
+      // 实例化 lsf，类在 lsf/src/LabelStudio.js 中定义
       this.lsfInstance = new LSF(this.root, settings);
 
       const names = Array.from(this.datamanager.callbacks.keys())
@@ -170,7 +174,7 @@ export class LSFWrapper {
         });
       });
     } catch (err) {
-      console.error("Failed to initialize LabelStudio", settings);
+      console.error("初始化 LabelStudio 失败！settings:", settings);
       console.error(err);
     }
   }
@@ -178,7 +182,7 @@ export class LSFWrapper {
   /** @private */
   async loadTask(taskID, annotationID, fromHistory = false) {
     if (!this.lsf) {
-      return console.error("Make sure that LSF was properly initialized");
+      return console.error("请确保 LSF 被正确初始化");
     }
 
     const tasks = this.datamanager.store.taskStore;
@@ -191,7 +195,7 @@ export class LSFWrapper {
       }
     });
 
-    /* If we're in label stream and there's no task – end the stream */
+    /* 如果标签流中没有任务，则结束，让 noTask 为 true */
     if (this.labelStream && !newTask) {
       this.lsf.setFlags({ noTask: true });
       return;
@@ -243,12 +247,12 @@ export class LSFWrapper {
           c = cs.annotations.find(c => c.pk === draftAnnotationPk);
           if (c) {
             c.history.freeze();
-            console.log("Applying draft");
+            console.log("lsf-sdk/setAnnotation()  应用草稿");
             c.addVersions({ draft: draft.result });
             c.deleteAllRegions({ deleteReadOnly: true });
           } else {
             // that shouldn't happen
-            console.error(`No annotation found for pk=${draftAnnotationPk}`);
+            console.error(`lsf-sdk/setAnnotation()  在 pk=${draftAnnotationPk} 中找不到 Annotation`);
             continue;
           }
         } else {
@@ -305,6 +309,7 @@ export class LSFWrapper {
     }
   }
 
+  // 这里的 ls 是 lsf 传来的 AppStore
   onLabelStudioLoad = async (ls) => {
     this.datamanager.invoke("labelStudioLoad", ls);
     this.lsf = ls;
@@ -313,6 +318,10 @@ export class LSFWrapper {
       await this.loadTask();
     }
   };
+
+  onProjectFetch = async () => {
+    return await this.datamanager.apiCall("project");
+  }
 
   /** @private */
   onTaskLoad = async (...args) => {
@@ -485,15 +494,16 @@ export class LSFWrapper {
 
 
   onNextTask = (nextTaskId, nextAnnotationId) => {
-    console.log(nextTaskId, nextAnnotationId);
+    console.log({ nextTaskId, nextAnnotationId });
 
     this.loadTask(nextTaskId, nextAnnotationId, true);
   }
   onPrevTask = (prevTaskId, prevAnnotationId) => {
-    console.log(prevTaskId, prevAnnotationId);
+    console.log({ prevTaskId, prevAnnotationId });
 
     this.loadTask(prevTaskId, prevAnnotationId, true);
   }
+
   async submitCurrentAnnotation(eventName, submit, includeId = false, loadNext = true) {
     const { taskID, currentAnnotation } = this;
     const serializedAnnotation = this.prepareData(currentAnnotation, { includeId });

@@ -37,10 +37,10 @@ export const DataStoreToggle = viewInjector(({ view, size, ...rest }) => {
       {...rest}
     >
       <RadioGroup.Button value="tasks">
-        Tasks
+        任务
       </RadioGroup.Button>
       <RadioGroup.Button value="annotations" disabled>
-        Annotations
+        标注结果
       </RadioGroup.Button>
     </RadioGroup>
   );

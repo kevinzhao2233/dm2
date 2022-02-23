@@ -376,6 +376,7 @@ export class DataManager {
 
     this.lsf = new LSFWrapper(this, element, {
       ...this.labelStudioOptions,
+      projectId: this.projectId,
       task: this.store.taskStore.selected,
       // annotation: this.store.annotationStore.selected,
       isLabelStream: this.mode === 'labelstream',
@@ -400,7 +401,7 @@ export class DataManager {
     const taskExists = isDefined(this.lsf.task) && isDefined(task);
     const taskSelected = this.lsf.task?.id === task?.id;
 
-    // do nothing if the task is already selected
+    // 如果已经选择了任务，则不执行任何操作
     if (taskExists && taskSelected) {
       return;
     }
