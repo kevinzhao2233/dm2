@@ -94,7 +94,7 @@ export const DataView = injector(
 
         if (help && decoration?.help !== false) {
           children.push(
-            <Tooltip key="help-tooltip" title={translatedColumn[original.id].help}>
+            <Tooltip key="help-tooltip" title={translatedColumn[original.id]?.help}>
               <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
             </Tooltip>,
           );

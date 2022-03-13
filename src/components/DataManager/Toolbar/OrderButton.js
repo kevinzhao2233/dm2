@@ -3,6 +3,7 @@ import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { Button } from "../../Common/Button/Button";
 import { FieldsButton } from "../../Common/FieldsButton";
 import { Space } from "../../Common/Space/Space";
+import { translatedColumn } from "../../Table/Translation";
 
 const injector = inject(({ store }) => {
   const view = store?.currentView;
@@ -21,7 +22,7 @@ export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
         <FieldsButton
           size={size}
           style={{ minWidth: 67, textAlign: "left", marginRight: -1 }}
-          title={ordering ? ordering.column?.title : "未设置"}
+          title={ordering ? (translatedColumn[ordering.column.id]?.title || ordering.column?.title) : "未设置"}
           onClick={(col) => view.setOrdering(col.id)}
           onReset={() => view.setOrdering(null)}
           resetTitle="默认"
