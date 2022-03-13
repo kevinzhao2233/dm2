@@ -18,7 +18,7 @@ export const DatePicker = ({
   value,
   selectRange = false,
   showTime = false,
-  dateFormat = "MM.dd.yyyy",
+  dateFormat = "yyyy-MM-dd",
   timeFormat = "HH:mm",
   onChange,
 }) => {

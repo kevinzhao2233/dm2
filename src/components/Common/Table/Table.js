@@ -116,7 +116,7 @@ export const Table = observer(
         };
 
         return (
-          <Tooltip title="Show task source">
+          <Tooltip title="展示任务源">
             <Button
               type="link"
               style={{ width: 32, height: 32, padding: 0 }}

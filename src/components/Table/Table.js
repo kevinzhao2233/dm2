@@ -12,6 +12,7 @@ import { Tag } from "../Common/Tag/Tag";
 import { Tooltip } from "../Common/Tooltip/Tooltip";
 import * as CellViews from "./CellViews";
 import { GridView } from "./GridView/GridView";
+import { translatedColumn } from "./Translation";
 import "./Table.styl";
 
 const injector = inject(({ store }) => {
@@ -93,7 +94,7 @@ export const DataView = injector(
 
         if (help && decoration?.help !== false) {
           children.push(
-            <Tooltip key="help-tooltip" title={help}>
+            <Tooltip key="help-tooltip" title={translatedColumn[original.id].help}>
               <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
             </Tooltip>,
           );
@@ -165,13 +166,13 @@ export const DataView = injector(
 
       if (column.icon) {
         return (
-          <Tooltip title={column.help ?? col.title}>
+          <Tooltip title={(translatedColumn[column.id]?.help || column.help) ?? col.title}>
             {column.icon}
           </Tooltip>
         );
       }
 
-      return column.title;
+      return translatedColumn[column.id]?.title || column.title;
     };
 
     const commonDecoration = useCallback((

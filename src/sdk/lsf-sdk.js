@@ -29,6 +29,7 @@ const DEFAULT_INTERFACES = [
   "edit-history", // undo/redo
 ];
 
+// lsf 里 src/LabelStudio.js 定义的 LabelStudio 类
 let LabelStudioDM;
 
 const resolveLabelStudio = async () => {

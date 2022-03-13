@@ -6,6 +6,7 @@ import {
   ViewColumnTypeShort
 } from "../../../../stores/Tabs/tab_column";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
+import { translatedColumn } from "../../../Table/Translation";
 import { Button } from "../../Button/Button";
 import { Dropdown } from "../../Dropdown/Dropdown";
 import { Menu } from "../../Menu/Menu";
@@ -113,7 +114,8 @@ const ColumnRenderer = observer(
       : null;
     const content = Decoration?.content
       ? Decoration.content(column)
-      : column.title;
+      : translatedColumn[column.original.id]?.title ?? column.title;
+
     const style = getStyle(cellViews, column, Decoration);
 
     const headContent = (
