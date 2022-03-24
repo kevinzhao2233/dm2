@@ -7,6 +7,7 @@ import { Interface } from "../../Common/Interface";
 import { ExportButton, ImportButton } from "../../Common/SDKButtons";
 import { ActionsButton } from "./ActionsButton";
 import { GridWidthButton } from "./GridWidthButton";
+import { ReviewButton } from "./ReviewButton";
 import { LabelButton } from "./LabelButton";
 import { LoadingPossum } from "./LoadingPossum";
 import { OrderButton } from "./OrderButton";
@@ -44,6 +45,9 @@ export const instruments = {
   },
   'loading-possum': () => {
     return <LoadingPossum/>;
+  },
+  'review-button': () => {
+    return <ReviewButton/>;
   },
   'label-button': ({ size }) => {
     return <LabelButton size={size}/>;

@@ -114,6 +114,7 @@ export const DataView = injector(
     // 点击行，打开新页面？
     const onRowClick = useCallback(
       (item, e) => {
+        // 如果点击了 meta 或 ctrl 键，则新打开标签，进行标注；否则在当前界面直接开始标注
         if (e.metaKey || e.ctrlKey) {
           window.open(`./?task=${item.task_id ?? item.id}`, "_blank");
         } else {

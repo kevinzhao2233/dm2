@@ -234,12 +234,32 @@ export const AppStore = types
       });
     },
 
-    startLabelStream(options = {}) {
+    // 点击 topbar 的按钮开始审核
+    startReviewStream(options = {}) {
       if (!self.confirmLabelingConfigured()) return;
 
       self.SDK.setMode("labelstream");
 
+      self.SDK.interfaces.set('review', true);
+
       if (options?.pushState !== false) {
+        History.navigate({ labeling: 1, reviewing: 1 });
+      }
+
+      return;
+    },
+
+    // 点击 topbar 的按钮开始标注
+    startLabelStream(options = {}) {
+      console.log({ options });
+      if (!self.confirmLabelingConfigured()) return;
+
+      self.SDK.setMode("labelstream");
+
+      self.SDK.interfaces.set('review', false);
+
+      if (options?.pushState !== false) {
+        // 好奇，labeling: 1 是干嘛的
         History.navigate({ labeling: 1 });
       }
 
@@ -248,12 +268,15 @@ export const AppStore = types
       return;
     },
 
+    // 点击 dm 列表开始标记
     startLabeling(item, options = {}) {
       if (!self.confirmLabelingConfigured()) return;
 
       if (self.dataStore.loadingItem) return;
 
       self.SDK.setMode("labeling");
+
+      self.SDK.interfaces.set('review', false);
 
       if (item && !item.isSelected) {
         const labelingParams = {
@@ -405,7 +428,7 @@ export const AppStore = types
     fetchData: flow(function* ({ isLabelStream } = {}) {
       self.setLoading(true);
 
-      const { tab, task, labeling, query } = History.getParams();
+      const { tab, task, labeling, query, reviewing } = History.getParams();
 
       const [projectFetched] = yield Promise.all([
         yield self.fetchProject(),
@@ -418,7 +441,7 @@ export const AppStore = types
         if (!isLabelStream) {
           yield self.fetchActions();
           if (!self.SDK.settings?.onlyVirtualTabs) {
-            yield self.viewsStore.fetchTabs(tab, task, labeling);
+            yield self.viewsStore.fetchTabs(tab, task, labeling, reviewing);
           } else {
             yield self.viewsStore.addView({ virtual: true }, { autosave: false });
           }

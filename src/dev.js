@@ -1,4 +1,4 @@
-import { Button } from "./components/Common/Button/Button";
+// import { Button } from "./components/Common/Button/Button";
 
 const API_GATEWAY = process.env.API_GATEWAY;
 const LS_ACCESS_TOKEN = process.env.LS_ACCESS_TOKEN;
@@ -42,11 +42,6 @@ export const initDevApp = async (DataManager) => {
           "annotations:id",
           "annotations:task_id",
         ],
-      },
-    },
-    instruments: {
-      'review-button': () => {
-        return () => <Button style={{ width: 105 }}>审查</Button>;
       },
     },
   });

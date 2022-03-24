@@ -84,6 +84,9 @@ export class DataManager {
   /** @type {"development" | "production"} */
   env = "development";
 
+  /**
+   * mode 是切换标注状态的工具
+   */
   /** @type {"explorer" | "labelstream"} */
   mode = "explorer";
 
@@ -145,6 +148,7 @@ export class DataManager {
     this.spinnerSize = config.spinnerSize;
     this.instruments = prepareInstruments(config.instruments ?? {}),
     this.apiTransform = config.apiTransform ?? {};
+    // interfaces 的文档：https://labelstud.io/guide/frontend_reference.html#interfaces
     this.interfaces = objectToMap({
       tabs: true,
       toolbar: true,
@@ -152,8 +156,8 @@ export class DataManager {
       export: true,
       labelButton: true,
       backButton: true,
-      labelingHeader: true,
-      groundTruth: false,
+      labelingHeader: false,
+      groundTruth: false, // 社区版没法用这个功能
       instruction: false,
       autoAnnotation: false,
       ...config.interfaces,
@@ -248,9 +252,10 @@ export class DataManager {
     });
   }
 
+  // 注册工具，貌似并没有被调用
   registerInstrument(name, initializer) {
     if (instruments[name]) {
-      return console.warn(`Can't override native instrument ${name}`);
+      return console.warn(`不能覆盖已有的工具：${name}`);
     }
 
     this.instruments.set(name, initializer({
@@ -263,7 +268,7 @@ export class DataManager {
   }
 
   /**
-   * Assign an event handler
+   * 派发事件处理程序
    * @param {string} eventName
    * @param {Function} callback
    */
@@ -384,14 +389,14 @@ export class DataManager {
   }
 
   /**
-   * Initialize LSF or use already initialized instance.
-   * Render LSF interface and load task for labeling.
-   * @param {HTMLElement} element Root element LSF will be rendered into
+   * 初始化 LSF 或使用已初始化的实例。
+   * 渲染 LSF interface 并加载用于标记的任务。
+   * @param {HTMLElement} element LSF 要渲染的根元素
    * @param {import("../stores/Tasks").TaskModel} task
    */
   async startLabeling() {
     if (!this.lsf) return;
-
+    // 当前选择的任务和标注结果
     let [task, annotation] = [
       this.store.taskStore.selected,
       this.store.annotationStore.selected,

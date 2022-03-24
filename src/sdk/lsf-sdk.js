@@ -69,10 +69,10 @@ export class LSFWrapper {
   interfacesModifier = (interfaces) => interfaces;
 
   /**
-   *
-   * @param {DataManager} dm
-   * @param {HTMLElement} element
-   * @param {LSFOptions} options
+   * 在 dm-sdk 中 initLSF() 方法中调用
+   * @param {DataManager} dm，即 dm-sdk 中的 this
+   * @param {HTMLElement} element .lsf-container
+   * @param {LSFOptions} options  组装的参数
    */
   constructor(dm, element, options) {
     this.datamanager = dm;
@@ -90,7 +90,7 @@ export class LSFWrapper {
     if (this.project.enable_empty_annotation === false) {
       interfaces.push("annotations:deny-empty");
     }
-
+    // console.log('--->> new LSF\n', { 'this.datamanager': this.datamanager, element, options, project: this.project });
     if (this.labelStream) {
       interfaces.push("infobar");
       interfaces.push("topbar:prevnext");
@@ -99,11 +99,11 @@ export class LSFWrapper {
       }
     } else {
       interfaces.push(
-        "infobar",
-        "annotations:add-new",
-        "annotations:view-all",
+        "infobar", // 标注界面下方的信息栏
+        "annotations:add-new", // 添加新的标注
+        "annotations:view-all", // 查看所有标注
         "annotations:delete",
-        "annotations:tabs",
+        "annotations:tabs", // 添加新标注那个下拉框
         "predictions:tabs",
       );
     }
@@ -119,6 +119,11 @@ export class LSFWrapper {
     if (this.datamanager.hasInterface("autoAnnotation")) {
       interfaces.push("auto-annotation");
     }
+    
+    if (this.datamanager.hasInterface("review")) {
+      interfaces.push("review");
+    }
+
     if (this.interfacesModifier) {
       interfaces = this.interfacesModifier(interfaces, this.labelStream);
     }
@@ -143,6 +148,8 @@ export class LSFWrapper {
       onSubmitAnnotation: this.onSubmitAnnotation,
       onUpdateAnnotation: this.onUpdateAnnotation,
       onDeleteAnnotation: this.onDeleteAnnotation,
+      onAcceptAnnotation: this.onAcceptAnnotation,
+      onRejectAnnotation: this.onRejectAnnotation,
       onSkipTask: this.onSkipTask,
       onCancelSkippingTask: this.onCancelSkippingTask,
       onGroundTruth: this.onGroundTruth,
@@ -196,12 +203,13 @@ export class LSFWrapper {
       }
     });
 
-    /* 如果标签流中没有任务，则结束，让 noTask 为 true */
+    /* 如果 labelStream 中没有任务，则结束，让 noTask 为 true */
     if (this.labelStream && !newTask) {
       this.lsf.setFlags({ noTask: true });
       return;
     } else {
       // don't break the LSF - if user explores tasks after finishing labeling, show them
+      // 不要破坏 LSF——如果用户在完成标记后探索任务，请展示它们
       this.lsf.setFlags({ noTask: false });
     }
 
@@ -209,6 +217,12 @@ export class LSFWrapper {
     if (newTask) this.selectTask(newTask, annotationID, fromHistory);
   }
 
+  /**
+   * 选择任务，dm-sdk 中 startLabeling() 调用了
+   * @param {object} 当前选择的任务
+   * @param {*} 最新的 annotationID 
+   * @param {*} fromHistory 
+   */
   selectTask(task, annotationID, fromHistory = false) {
     const needsAnnotationsMerge = task && this.task?.id === task.id;
     const annotations = needsAnnotationsMerge ? [...this.annotations] : [];
@@ -229,6 +243,11 @@ export class LSFWrapper {
     this.setAnnotation(annotationID, fromHistory);
   }
 
+  /**
+   * 
+   * @param {*} annotationID 
+   * @param {*} fromHistory 
+   */
   /** @private */
   setAnnotation(annotationID, fromHistory = false) {
     const id = annotationID ? annotationID.toString() : null;
@@ -272,11 +291,14 @@ export class LSFWrapper {
         c.history.safeUnfreeze();
       }
     }
-
+    // TODO 这里实在奇怪，this.annotations 里面确实有值，但是却取不到下标为 0 的那个
     const first = this.annotations[0];
     // if we have annotations created automatically, we don't need to create another one
     // automatically === created here and haven't saved yet, so they don't have pk
     // @todo because of some weird reason pk may be string uid, so check flags then
+    // 如果我们有自动创建的 annotations，我们不需要再创建一个
+    // 
+    // TODO 由于某些奇怪的原因，pk可能是字符串uid，所以请检查标志
     const hasAutoAnnotations = !!first && (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
     const showPredictions = this.project.show_collab_predictions === true;
 
@@ -370,6 +392,7 @@ export class LSFWrapper {
     await this.loadTask(this.task.id, annotation.pk, true);
   };
 
+  // 删除草稿事件
   deleteDraft = async (id) => {
     const response = await this.datamanager.apiCall("deleteDraft", {
       draftID: id,
@@ -379,6 +402,7 @@ export class LSFWrapper {
     return response;
   }
 
+  // 删除标注结果事件
   /**@private */
   onDeleteAnnotation = async (ls, annotation) => {
     const { task } = this;
@@ -410,6 +434,7 @@ export class LSFWrapper {
     }
   };
 
+  // 提交草稿事件
   onSubmitDraft = async (studio, annotation) => {
     const annotationDoesntExist = !annotation.pk;
     const data = { body: this.prepareData(annotation, { draft: true }) }; // serializedAnnotation
@@ -433,6 +458,7 @@ export class LSFWrapper {
     }
   };
 
+  // 跳过事件
   onSkipTask = async () => {
     await this.submitCurrentAnnotation(
       "skipTask",
@@ -454,11 +480,12 @@ export class LSFWrapper {
     );
   };
 
+  // 取消跳过事件
   onCancelSkippingTask = async () => {
     const { task, currentAnnotation } = this;
 
     if (!isDefined(currentAnnotation) && !isDefined(currentAnnotation.pk)) {
-      console.error('Annotation must be on unskip');
+      console.error('Annotation 必须在 unskip 上');
       return;
     }
 
@@ -484,8 +511,25 @@ export class LSFWrapper {
     });
     await this.loadTask(task.id);
     this.datamanager.invoke("cancelSkippingTask");
-
   };
+
+  /**
+   * 接受标注 事件
+   * @param {*} ls lsf 的整个 store
+   * @param {*} params { isDirty, entity }
+   */
+  onAcceptAnnotation = async (ls, { isDirty, entity }) => {
+    console.log('lsf-sdk --- onAcceptAnnotation', { ls, isDirty, entity });
+  }
+  
+  /**
+   * 拒绝标注 事件
+   * @param {*} ls lsf 的整个 store
+   * @param {*} params { isDirty, entity, comment }，其中 comment 是评论
+   */
+  onRejectAnnotation = async (ls, { isDirty, entity, comment }) => {
+    console.log('lsf-sdk --- onRejectAnnotation', { ls, isDirty, entity, comment });
+  }
 
   // Proxy events that are unused by DM integration
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);

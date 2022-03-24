@@ -2,74 +2,74 @@
 
 [Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
 
-Data exploration tool for [Label Studio][ls].
+[Label Studio][ls] 的数据浏览工具
 
 <img src="https://raw.githubusercontent.com/heartexlabs/dm2/master/docs/image.png" height="500" align="center"/>
 
-## Summary
+## 摘要
 
 <img align="right" height="180" src="https://github.com/heartexlabs/label-studio/blob/master/images/heartex_icon_opossum_green@2x.png?raw=true" />
 
-- [Quick Start](#quick-start)
-- [Features](#features-star2)
-- [Usage](#usage)
+- [开始开始](#quick-start)
+- [特性](#features-star2)
+- [使用](#usage)
 - [Under the hood](#under-the-hood)
-- [Build and run](#build-and-run)
-- [Develoment](#development)
+- [构建并运行](#build-and-run)
+- [发展](#development)
 - [License](#license)
 
-### Quickstart
+### 快速开始
 
 ```
 npm install @heartexlabs/datamanager
 ```
 
-### Features
+### 特性
 
-- Grid and list view to easily explore your datasets
-- Customizable data representation: select what data you want to see and how to show it
-- Easily slice your datasates with filters for more precise exploration
-- Deep integration with Label Studio Frontend
+- 网格和列表视图可轻松浏览你的数据集
+- 可定制的数据表示:选择你想要查看的数据以及如何显示
+- 使用过滤器轻松地对数据进行切片，以便进行更精确的探索
+- 与 Label Studio Frontend 深度集成
 
-### Usage
+### 使用
 
-You can use DataManager as a standalone module.
+你可以将DataManager作为独立模块使用。
 
-**Keep in mind that DataManager requires [backend api](#under-the-hood) to operate. In case of standalone usage you need to implement backend yourself.**
+**请记住，DataManager需要[后端api](#under-the-hood)才能运行。在独立使用的情况下，你需要自己实现后端。**
 
-#### Installation
+#### 安装
 
 ```
 npm install @heartexlabs/datamanager
 ```
 
-#### Initialize
+#### 初始化
 
 ```javascript
 import { DataManager } from '@heartexlabs/datamanager';
 
 const dm = new DataManager({
-  // Where to render DataManager
+  // 将要在哪里渲染 DataManager
   root: document.querySelector('.app'),
   // API gateway
   apiGateway: 'https://example.com/api',
   // API settings
   apiEndpoints: {
     // here you can override API endpoints
-    // default config could be found in api-config.js
+    // 默认配置在 api-config.js
   },
-  // Disable requests mocking
+  // 禁用请求模拟 moking？
   apiMockDisabled: process.env.NODE_ENV === 'production',
-  // Passing parameters to Label Studio Frontend
+  // 传递参数到 Label Studio Frontend
   labelStudio: {
     user: { pk: 1, firstName: "James" }
   },
-  // Table view settings
+  // 设置表格展示
   table: {
     hiddenColumns: {/*...*/},
     visibleColumns: {/*...*/}
   },
-  // Setup links. Null value will hide the button
+  // 设置链接。空值将隐藏按钮
   links: {
     import: '/import',
     export: '/export',
@@ -77,9 +77,9 @@ const dm = new DataManager({
 })
 ```
 
-#### Events
+#### 事件
 
-DataManager forwards most of the events from Label Studio.
+DataManager转发 Label Studio 中的大部分事件。
 
 ```js
 dm.on('submitAnnotation', () => /* handle the submit process */)
@@ -89,9 +89,11 @@ dm.on('submitAnnotation', () => /* handle the submit process */)
 
 To have access to the backend DataManager uses endpoints. Every endpoint is converted into a named method that DM will use under the hood. Full list of those method could be found [here](#under-the-hood).
 
-Every endpoint could be either a string or an object.
+每个 endpoint 可以是字符串或对象，endpoint 其实就是一个请求，比如 GET /projects 这样的请求。
 
 API endpoint paths also support `:[parameter-name]` notation, e.g. `/tabs/:tabID/tasks`. These parameteres are required if specified. This means DM will throw an exception if the parameter is not present in the API call.
+
+API endpoint 路径也支持 `:[parameter-name]` 符号，例如`/tabs/:tabID/tasks `。如果指定，这些参数是必需的。这意味着如果参数不在 API 调用中，DM 将抛出一个异常。
 
 ```js
 // In this case DM will assume that api.columns() is a get request
@@ -100,9 +102,7 @@ apiEndpoints: {
 }
 ```
 
-
-
-For requests other than **GET** use object notation:
+对于 **GET** 以外的请求，请使用对象表示法:
 
 ```javascript
 // If you want to specify a method, use oject instead
@@ -114,34 +114,34 @@ apiEndpoints: {
 }
 ```
 
-###### Response conversion
+###### 响应转换
 
 ```javascript
-// In case you already have the api but the response doesn't fit the format expected by DM
-// you can convert the response on the fly
+// 如果你已经有了api，但是响应不符合 DM 期望的格式
+// 你可以即时转换响应
 apiEndpoints: {
   tabs: {
     path: "/api/tabs",
     convert: (response) => {
-			/* do whatever you need with the response */
-      /* then return the modified object */
+			/* 实现任何你需要的响应 */
+      /* 然后返回修改后的对象 */
       return response
     }
   }
 }
 ```
 
-###### Request mock
+###### 请求 mock
 
-DataManager supports requests mocking. This feature comes handy for the development purposes.
+DataManager 支持请求模拟。这个特性对于开发来说非常方便。
 
 ```javascript
 apiEndpoints: {
   columns: {
     path: "/api/columns",
     mock: (url, requestParams, request) => {
-      // here you can process the request and return the response
-      // execution of this method can be disabled by using `apiMockDisabled: true`
+      // 在这里，你可以处理请求并返回响应
+      // 可以使用 “apimockdabled:true” 来禁用此方法的执行`
     }
   }
 }
@@ -150,37 +150,37 @@ apiEndpoints: {
 
 ### Under the hood
 
-- [Backend API][api_docs]
-- [Architecture][dm_architecture]
+- [后端 API][api_docs]
+- [架构][dm_architecture]
 
-### Build and run
+### 构建和运行
 
-#### Run in development mode with server API
+#### 使用服务器 API 在开发模式下运行
 
-Ensure that Label Studio is running, then configure your environment. Copy `.env.defaults` into `.env` and change settings:
+确保 Label Studio 正在运行，然后配置你的环境。将`.env.defaults` 的内容复制到 `.env` 并更改设置:
 
-- `API_GATEWAY=http://localhost:8080/api/dm` or other API root if you have one
-- `LS_ACCESS_TOKEN` — to get this token go to LS, open menu from avatar in top right corner, go to Account page, copy token
+- `API_GATEWAY=http://localhost:8080/api/dm` 或者其他 API 地址
+- `LS_ACCESS_TOKEN` — 要获取此令牌，请到LS，从右上角的头像中打开菜单，转到帐户页面，复制令牌
 
-Also you have to change `data-project-id` in `public/index.html` to project you want to use. DM always works with only one project at a time.
+你也必须改变 `public/index.html` 中的 `data-project-id`，这是要使用的项目 ID。DM 总是一次只处理一个项目。
 
-Then start DM with simple command:
+然后用简单的命令启动DM:
 
 ```
 npm run start
 ```
 
-#### Build for production and standalone usage
+#### 为生产和独立使用而构建
 
-Builds a CommonJS compatible module
+构建一个 CommonJS 兼容模块
 
 ```
 npm run build:module
 ```
 
-#### Build for Label Studio
+#### 为 Label Studio 构建
 
-Wait until the artifact is built, then navigate to the Label Studio directory and execute the following command in your command line:
+等到构建好完成，然后导航到 Label Studio 目录，并在命令行中执行以下命令:
 
 ```
 node scripts/get-build.js dm [branch-name]
@@ -188,31 +188,33 @@ node scripts/get-build.js dm [branch-name]
 
 `branch-name` – optional, default: `master`
 
-## Development
+## 开发
 
-### Prerequisites
+### 先决条件
 
-For the development it is required to have Label Studio installed and running as the DataManager uses LabelStudio API to operate.
+对于开发，需要安装 Label Studio 并运行，因为 DataManager 使用 LabelStudio API 进行操作。
 
-If you're using your own backend, make sure that the API implements all the methods DataManager requires.
+如果你使用自己的后端，请确保 API 实现了 DataManager 要求的所有方法。
 
-### Running local version of DataManager
+### 运行 DataManager 的本地版本
+
+安装依赖，关于 npm ci 和 npm install 的区别请看[这篇文章](https://cloud.tencent.com/developer/section/1490280)
 
 ```
 npm ci
 ```
 
-Run local version of the DataManager
+运行 DataManager 的本地版本
 
 ```
 npm start
 ```
 
-### DataManager and Label Studio Frontend
+### DataManager 和 Label Studio Frontend
 
-By default DataManager comes with the latest version of Label Studio Frontent available on npm at the moment.
+默认情况下，DataManager 附带了 npm 上目前可用的 Label Studio Frontent 的最新版本。
 
-If you need another version, you have several options to connect it.
+如果你需要另一个版本，你有几个方式来连接它。
 
 #### Using version from unpkg.com
 
@@ -220,11 +222,11 @@ You can take whatever version of LSF you need from unpkg.com and replace the exi
 
 #### Using local clone
 
-If need more control over the changes or you're developing some sort of integration between DataManager and Label Studio Frontend, you'll need to clone `label-studio-frontend` locally first.
+如果需要对更改进行更多的控制，或者您正在开发 DataManager 和 Label Studio 前端之间的某种集成，您将需要首先在本地克隆 `label-studio-frontend`。
 
-1. Follow the [Development guide](https://github.com/heartexlabs/label-studio-frontend#development) first and build a production version of Label Studio Frontend.
-2. Grab the contents of `./build/static` directory and copy it over to Data Manager `public` folder.
-3. Edit `public/index.html`, you will need to replace these two lines:
+1. 先按照[开发指南](https://github.com/heartexlabs/Label-Studio-Frontend#Development)，构建 Label Studio Frontend 的生产版。
+2. 将 `label-studio-frontend` 的构建结果复制到 Data Manager 的 public 目录。
+3. 编辑 `public/index.html`, 你需要替换这两行:
 
 ```diff
 <!-- Label Studio Frontend -->
@@ -234,31 +236,31 @@ If need more control over the changes or you're developing some sort of integrat
 +    <script src="./static/js/main.js"></script>
 ```
 
-#### Using custom DM build in Label Studio
+#### 在 Label Studio 中使用自己构建的 DM
 
-You can install DataManager into Label Studio by replacing bundle files.
+您可以通过替换包文件将 DataManager 安装到 Label Studio 中。
 
-First, build the DataManager itself:
+首先，构建 DataManager 自身:
 
-```
+```bash
 npm ci && npm run build:module
 ```
 
-Next replace the bundle in Label Studio with a new one:
+复制构建的结果到 Label Studio:
 
-```
+```bash
 cp -r ./build/**/* [your-label-studio-path]/label-studio/static/dm/
 ```
 
-Now you can start Label Studio if it's not running, or refresh the page in the browser.
+启动 Label Studio 或刷新浏览器。
 
-## Ecosystem
+## 生态
 
-| Project | Description |
+| 项目 | 描述 |
 |-|-|
-| [label-studio][ls] | Server part, distributed as a pip package |
-| [label-studio-frontend][lsf] | Frontend part, written in JavaScript and React, can be embedded into your application |
-| [label-studio-converter][lsc] | Encode labels into the format of your favorite machine learning library |
+| [label-studio][ls] | 服务端, 作为 pip 包分发 |
+| [label-studio-frontend][lsf] | 前端, 用 JavaScript 和 React 编写，可以嵌入到您的应用程序中 |
+| [label-studio-converter][lsc] | 将标签编码为您最喜欢的机器学习库的格式 |
 | [label-studio-transformers][lst] | Transformers library connected and configured for use with label studio |
 | datamanager | Data exploration tool for Label Studio |
 

@@ -1,3 +1,7 @@
+/**
+ * 貌似是个废弃的文件，没有被使用到
+ */
+
 import { Component } from "react";
 import ReactDOM from "react-dom";
 

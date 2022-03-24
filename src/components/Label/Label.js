@@ -1,3 +1,7 @@
+/**
+ * 标注界面，包括含有表格的模式和纯标注界面的模式
+ */
+
 import { inject } from "mobx-react";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { FaCaretDown, FaChevronLeft, FaColumns } from "react-icons/fa";
@@ -69,6 +73,7 @@ export const Labeling = injector(
       SDK.startLabeling();
     }, [lsfRef]);
 
+    // 如果是 explorer 模式的，则走这个 useEffect
     useEffect(() => {
       if (!isLabelStream) SDK.on("taskSelected", initLabeling);
 
@@ -80,7 +85,7 @@ export const Labeling = injector(
       };
     }, []);
 
-    // 初始化和卸载 LSF
+    // 如果是 labelstream 模式的，则走这个 useEffect
     useEffect(() => {
       if (isLabelStream) {
         SDK.initLSF(lsfRef.current);

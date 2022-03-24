@@ -433,7 +433,7 @@ export const TabStore = types
       self.defaultHidden = TabHiddenColumns.create(hiddenColumns);
     },
 
-    fetchTabs: flow(function* (tab, taskID, labeling) {
+    fetchTabs: flow(function* (tab, taskID, labeling, reviewing) {
       const tabId = parseInt(tab);
       const response = yield getRoot(self).apiCall("tabs");
       const tabs = response.tabs ?? response ?? [];
@@ -458,7 +458,11 @@ export const TabStore = types
 
       yield self.selected.save();
 
-      if (labeling) {
+      if (reviewing) {
+        getRoot(self).startReviewStream({
+          pushState: false,
+        });
+      } else if (labeling) {
         getRoot(self).startLabelStream({
           pushState: false,
         });

@@ -115,7 +115,7 @@ export const LabelButton = injector(({ store, canLabel, size, target, selectedCo
           mod={{ size: "medium", disabled }}
           onClick={onLabelVisible}
         >
-          标记任务为 Displayed
+          标注过滤后的任务
         </Button>
       </div>
     </Interface>
