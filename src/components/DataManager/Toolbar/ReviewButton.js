@@ -18,6 +18,7 @@ const injector = inject(({ store }) => {
 export const ReviewButton = injector(({ store, size, target, selectedCount }) => {
   // const all = selectedCount === 0 || allSelected;
   // console.log('reviewButton comp', { store, canLabel, size, target, selectedCount });
+
   const disabled = target === "annotations";
 
   const onReview = () => {
