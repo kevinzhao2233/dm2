@@ -1,4 +1,5 @@
 import { format, isMatch, isValid } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { default as DP } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -35,7 +36,7 @@ export const DatePicker = ({
     const parsedDate = new Date(date === null ? Date.now() : date);
 
     if (isValid(parsedDate)) {
-      return format(parsedDate, finalFormat);
+      return format(parsedDate, finalFormat, { locale: zhCN });
     }
 
     return "";

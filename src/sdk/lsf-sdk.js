@@ -25,6 +25,7 @@ const DEFAULT_INTERFACES = [
   "predictions:menu", // right menu with prediction items
   "annotations:menu", // right menu with annotation items
   "annotations:current",
+  "annotations:history",
   "side-column", // entity
   "edit-history", // undo/redo
 ];
@@ -119,7 +120,7 @@ export class LSFWrapper {
     if (this.datamanager.hasInterface("autoAnnotation")) {
       interfaces.push("auto-annotation");
     }
-    
+
     if (this.datamanager.hasInterface("review")) {
       interfaces.push("review");
     }
