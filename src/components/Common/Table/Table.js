@@ -87,6 +87,7 @@ export const Table = observer(
       });
     }
 
+    // 展示任务源代码，包含任务id、data、annotations、predictions
     columns.push({
       id: "show-source",
       cellClassName: "show-source",
@@ -122,7 +123,7 @@ export const Table = observer(
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
-                  title: "Source for task " + out?.id,
+                  title: "任务源 | ID：" + out?.id,
                   style: { width: 800 },
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} />,
                 });

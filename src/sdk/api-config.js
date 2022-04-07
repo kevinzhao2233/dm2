@@ -70,6 +70,18 @@ export const APIConfig = {
 
     /** Task drafts */
     taskDrafts: "/../tasks/:taskID/drafts",
+    
+    /** 为现有标注创建草稿 */
+    createDraftForAnnotation: {
+      path: "/../tasks/:taskID/annotations/:annotationID/drafts",
+      method: "post",
+    },
+
+    /** Create draft for new annotation */
+    createDraftForTask: {
+      path: "/../tasks/:taskID/drafts",
+      method: "post",
+    },
 
     /** Update draft by id */
     updateDraft: {
@@ -81,18 +93,6 @@ export const APIConfig = {
     deleteDraft: {
       path: "/../drafts/:draftID",
       method: "delete",
-    },
-
-    /** Create draft for existing annotation */
-    createDraftForAnnotation: {
-      path: "/../tasks/:taskID/annotations/:annotationID/drafts",
-      method: "post",
-    },
-
-    /** Create draft for new annotation */
-    createDraftForTask: {
-      path: "/../tasks/:taskID/drafts",
-      method: "post",
     },
 
     /** Override selected items list (checkboxes) */
