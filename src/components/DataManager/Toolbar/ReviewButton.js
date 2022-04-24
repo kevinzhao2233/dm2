@@ -8,16 +8,16 @@ const injector = inject(({ store }) => {
 
   return {
     store,
-    canLabel: totalTasks > 0 || foundTasks > 0,
+    canReview: (totalTasks > 0 || foundTasks > 0) && store.project.annotation_count > 0,
     target: currentView?.target ?? "tasks",
     selectedCount: currentView?.selectedCount,
     allSelected: currentView?.allSelected,
   };
 });
 
-export const ReviewButton = injector(({ store, size, target, selectedCount }) => {
+export const ReviewButton = injector(({ store, size, canReview, target, selectedCount }) => {
   // const all = selectedCount === 0 || allSelected;
-  // console.log('reviewButton comp', { store, canLabel, size, target, selectedCount });
+  console.log('reviewButton comp', { store, canReview, size, target, selectedCount });
 
   const disabled = target === "annotations";
 
@@ -31,7 +31,7 @@ export const ReviewButton = injector(({ store, size, target, selectedCount }) =>
     padding: 0,
   };
 
-  return (
+  return canReview ? (
     <Button
       size={size}
       disabled={disabled}
@@ -41,5 +41,5 @@ export const ReviewButton = injector(({ store, size, target, selectedCount }) =>
     >
       审核{selectedCount ? " " + selectedCount + " 个" : "所有"}任务
     </Button>
-  );
+  ) : null;
 });
