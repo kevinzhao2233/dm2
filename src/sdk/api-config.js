@@ -42,7 +42,7 @@ export const APIConfig = {
     annotations: "/views/:tabID/annotations",
 
     /** Single task (sample) */
-    task: "/tasks/:taskID",
+    task: "/../tasks/:taskID",
 
     /** Next task (labelstream, default sequential) */
     nextTask: "/tasks/next",
@@ -116,7 +116,7 @@ export const APIConfig = {
       method: "delete",
     },
 
-    /** Invoke a particular action */
+    /** 调用特定的动作，使用参数中的 id 来区分，比如 next_task, next_review */
     invokeAction: {
       path: "/actions",
       method: "post",

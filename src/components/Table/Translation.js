@@ -7,6 +7,10 @@ export const translatedColumn = {
     title: '完成时间',
     help: '最近完成标注的时间',
   },
+  'tasks:total_reviews': {
+    title: '标注审核数',
+    help: '任务的标注结果审核总数',
+  },
   'tasks:total_annotations': {
     title: '标注结果数',
     help: '任务的标注结果总数',

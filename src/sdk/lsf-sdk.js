@@ -14,6 +14,7 @@
 import { isDefined } from "../utils/utils";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
+import annotationOperateStatus from '../utils/annotationOperateStatus';
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -123,6 +124,7 @@ export class LSFWrapper {
 
     if (this.datamanager.hasInterface("review")) {
       interfaces.push("review");
+      interfaces.push("annotations:tabs");
     }
 
     if (this.interfacesModifier) {
@@ -140,6 +142,7 @@ export class LSFWrapper {
       keymap: options.keymap,
       forceAutoAnnotation: this.isInteractivePreannotations,
       forceAutoAcceptSuggestions: this.isInteractivePreannotations,
+      panels: this.datamanager.panels,
       /* EVENTS */
       onSubmitDraft: this.onSubmitDraft,
       onLabelStudioLoad: this.onLabelStudioLoad,
@@ -159,7 +162,6 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
-      panels: this.datamanager.panels,
     };
 
     this.initLabelStudio(lsfProperties);
@@ -190,6 +192,9 @@ export class LSFWrapper {
 
   /** @private */
   async loadTask(taskID, annotationID, fromHistory = false) {
+
+    console.log('dm - lsf-sdk.js loadTask');
+
     if (!this.lsf) {
       return console.error("请确保 LSF 被正确初始化");
     }
@@ -198,7 +203,7 @@ export class LSFWrapper {
 
     const newTask = await this.withinLoadingState(async () => {
       if (!isDefined(taskID)) {
-        return tasks.loadNextTask();
+        return tasks.loadNextTask({ review: this.datamanager.hasInterface("review") });
       } else {
         return tasks.loadTask(taskID);
       }
@@ -214,7 +219,7 @@ export class LSFWrapper {
       this.lsf.setFlags({ noTask: false });
     }
 
-    // Add new data from received task
+    // 从接收的任务添加新数据
     if (newTask) this.selectTask(newTask, annotationID, fromHistory);
   }
 
@@ -236,6 +241,10 @@ export class LSFWrapper {
 
     this.setLoading(false);
 
+    if (task.history) {
+      task.annotationHistory = task.history;
+    }
+
     const lsfTask = taskToLSFormat(task);
 
     this.lsf.resetState();
@@ -245,7 +254,7 @@ export class LSFWrapper {
   }
 
   /**
-   * 
+   * 设置标注结果
    * @param {*} annotationID 
    * @param {*} fromHistory 
    */
@@ -255,8 +264,10 @@ export class LSFWrapper {
     let { annotationStore: cs } = this.lsf;
     let annotation;
     const activeDrafts = cs.annotations.map(a => a.draftId).filter(Boolean);
+    const isReview = this.datamanager.hasInterface("review");
 
-    if (this.task.drafts) {
+    // 加载草稿，但在审核状态不加载
+    if (this.task.drafts && !isReview) {
       for (const draft of this.task.drafts) {
         if (activeDrafts.includes(draft.id)) continue;
         let c;
@@ -292,27 +303,36 @@ export class LSFWrapper {
         c.history.safeUnfreeze();
       }
     }
-    // TODO 这里实在奇怪，this.annotations 里面确实有值，但是却取不到下标为 0 的那个
+    // 这里实在奇怪，this.annotations 里面确实有值，但是却取不到下标为 0 的那个
     const first = this.annotations[0];
     // if we have annotations created automatically, we don't need to create another one
     // automatically === created here and haven't saved yet, so they don't have pk
     // @todo because of some weird reason pk may be string uid, so check flags then
     // 如果我们有自动创建的 annotations，我们不需要再创建一个
-    // 
-    // TODO 由于某些奇怪的原因，pk可能是字符串uid，所以请检查标志
+    // automatically === created 并且还未保存，所以没有 pk ？？？啥意思
+    // 由于某些奇怪的原因，pk可能是字符串uid，所以请检查标志
     const hasAutoAnnotations = !!first && (!first.pk || (first.userGenerate && first.sentUserGenerate === false));
     const showPredictions = this.project.show_collab_predictions === true;
 
     if (this.labelStream) {
-      if (first?.draftId) {
-        // not submitted draft, most likely from previous labeling session
-        annotation = first;
-      } else if (isDefined(annotationID) && fromHistory) {
-        annotation = this.annotations.find(({ pk }) => pk === annotationID);
-      } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
-        annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
+      // 审核状态，不创建新的标注结果，也不加载 draft
+      if (isReview) {
+        if (isDefined(annotationID) && fromHistory) {
+          annotation = this.annotations.find(({ pk }) => pk === annotationID);
+        } else if (first) {
+          annotation = first;
+        }
       } else {
-        annotation = cs.addAnnotation({ userGenerate: true });
+        if (first?.draftId) {
+          // not submitted draft, most likely from previous labeling session
+          annotation = first;
+        } else if (isDefined(annotationID) && fromHistory) {
+          annotation = this.annotations.find(({ pk }) => pk === annotationID);
+        } else if (showPredictions && this.predictions.length > 0 && !this.isInteractivePreannotations) {
+          annotation = cs.addAnnotationFromPrediction(this.predictions[0]);
+        } else {
+          annotation = cs.addAnnotation({ userGenerate: true });
+        }
       }
     } else {
       if (this.annotations.length === 0 && this.predictions.length > 0 && !this.isInteractivePreannotations) {
@@ -325,7 +345,6 @@ export class LSFWrapper {
         annotation = cs.addAnnotation({ userGenerate: true });
       }
     }
-
 
     if (annotation) {
       cs.selectAnnotation(annotation.id);
@@ -516,20 +535,62 @@ export class LSFWrapper {
 
   /**
    * 接受标注 事件
+   * isDirty 会在可以撤销的时候为 true，也就是点了 “修复并接受”
    * @param {*} ls lsf 的整个 store
    * @param {*} params { isDirty, entity }
    */
-  onAcceptAnnotation = async (ls, { isDirty, entity }) => {
-    console.log('lsf-sdk --- onAcceptAnnotation', { ls, isDirty, entity });
+  /** @private */
+  onAcceptAnnotation = async (ls, annotation, isDirty) => {
+    console.log('lsf-sdk onAcceptAnnotation');
+    await this.submitCurrentAnnotation(
+      "updateAnnotation",
+      (taskID, body) => {
+        const { id, ...annotation } = body;
+        const params = { 
+          taskID, 
+          annotationID: id,
+          review: isDirty ? annotationOperateStatus.TASK_FIX : annotationOperateStatus.TASK_PASS,
+        };
+        const options = { body: annotation };
+
+        params.annotationID = id;
+        return this.datamanager.apiCall("updateAnnotation", params, options);
+      },
+      true,
+      true,
+    );
   }
-  
+
   /**
-   * 拒绝标注 事件
+   * 拒绝标注结果 事件
    * @param {*} ls lsf 的整个 store
    * @param {*} params { isDirty, entity, comment }，其中 comment 是评论
    */
-  onRejectAnnotation = async (ls, { isDirty, entity, comment }) => {
-    console.log('lsf-sdk --- onRejectAnnotation', { ls, isDirty, entity, comment });
+  /** @private */
+  onRejectAnnotation = async (ls, { comment }) => {
+    console.log('lsf-sdk onRejectAnnotation');
+    await this.submitCurrentAnnotation(
+      "updateAnnotation",
+      (taskID, body) => {
+        const { id, ...annotation } = body;
+        const params = { 
+          taskID, 
+          annotationID: id,
+          review: annotationOperateStatus.TASK_REJECT,
+          review_text: comment || '',
+        };
+        const options = { body: {
+          ...annotation,
+          result: [],
+          lead_time: null,
+        } };
+
+        params.annotationID = id;
+        return this.datamanager.apiCall("updateAnnotation", params, options);
+      },
+      true,
+      true,
+    );
   }
 
   // Proxy events that are unused by DM integration
@@ -538,14 +599,13 @@ export class LSFWrapper {
   onSelectAnnotation = (...args) =>
     this.datamanager.invoke("onSelectAnnotation", ...args);
 
-
   onNextTask = (nextTaskId, nextAnnotationId) => {
-    console.log({ nextTaskId, nextAnnotationId });
+    console.log('dm lsf-sdk.js onNextTask', { nextTaskId, nextAnnotationId });
 
     this.loadTask(nextTaskId, nextAnnotationId, true);
   }
   onPrevTask = (prevTaskId, prevAnnotationId) => {
-    console.log({ prevTaskId, prevAnnotationId });
+    console.log('dm lsf-skd.js onPrevTask', { prevTaskId, prevAnnotationId });
 
     this.loadTask(prevTaskId, prevAnnotationId, true);
   }

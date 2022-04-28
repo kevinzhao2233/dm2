@@ -1,4 +1,5 @@
 export { default as LsAnnotation } from './annotation.svg';
+export { default as LsReview } from './review.svg';
 export { default as LsBanSquare } from './ban.svg';
 export { default as LsCheckAlt } from "./check_alt.svg";
 export { default as LsCrossAlt } from "./cross_alt.svg";

@@ -125,6 +125,7 @@ export const create = (columns) => {
       }),
     }));
 
+  // 使用 compose 可以将多个模型组合成一个新的模型
   const TaskModel = types.compose("TaskModel", TaskModelBase, DataStoreItem);
 
   return DataStore("TasksStore", {
@@ -136,6 +137,7 @@ export const create = (columns) => {
     },
   })
     .actions((self) => ({
+      // 项目初始时会调用，其他情况未知
       loadTask: flow(function* (taskID, { select = true } = {}) {
         if (!isDefined(taskID)) {
           console.warn("必须提供任务 ID ");
@@ -155,10 +157,18 @@ export const create = (columns) => {
         return task;
       }),
 
-      loadNextTask: flow(function* ({ select = true } = {}) {
-        const taskData = yield self.root.invokeAction("next_task", {
-          reload: false,
-        });
+      loadNextTask: flow(function* ({ select = true, review = false } = {}) {
+        let taskData = null;
+
+        if (review) {
+          taskData = yield self.root.invokeAction("next_review", {
+            reload: false,
+          });
+        } else {
+          taskData = yield self.root.invokeAction("next_task", {
+            reload: false,
+          });
+        }
 
         if (taskData?.$meta?.status === 404) {
           getRoot(self).SDK.invoke("labelStreamFinished");
@@ -188,7 +198,7 @@ export const create = (columns) => {
           const id = taskID ?? taskData.id;
           const snapshot = self.mergeSnapshot(id, taskData);
 
-          task = self.updateItem(taskID ?? taskData.id, {
+          task = self.updateItem(id, {
             ...snapshot,
             source: JSON.stringify(taskData),
           });
@@ -197,6 +207,7 @@ export const create = (columns) => {
         return task;
       },
 
+      // 将列表中任务的数据和当前获取到的详细信息合并
       mergeSnapshot(taskID, taskData){
         const task = self.list.find(({ id }) => id === taskID);
         const snapshot = task ? { ...getSnapshot(task) } : {};
@@ -224,7 +235,6 @@ export const create = (columns) => {
         if (total_predictions !== null)
           self.totalPredictions = total_predictions;
       },
-
     }))
     .preProcessSnapshot((snapshot) => {
       const { total_annotations, total_predictions, ...sn } = snapshot;

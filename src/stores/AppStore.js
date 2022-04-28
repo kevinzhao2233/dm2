@@ -178,6 +178,7 @@ export const AppStore = types
       self.toolbar = toolbarString;
     },
 
+    // 设置任务，explorer 模式打开标注界面会调用
     setTask: flow(function* ({ taskID, annotationID, pushState }) {
       if (pushState !== false) {
         History.navigate({ task: taskID, annotation: annotationID ?? null });
@@ -251,7 +252,7 @@ export const AppStore = types
 
     // 点击 topbar 的按钮开始标注
     startLabelStream(options = {}) {
-      console.log({ options });
+      console.log('dm:AppStore startLabelStream', { options });
       if (!self.confirmLabelingConfigured()) return;
 
       self.SDK.setMode("labelstream");
@@ -259,7 +260,7 @@ export const AppStore = types
       self.SDK.interfaces.set('review', false);
 
       if (options?.pushState !== false) {
-        // 好奇，labeling: 1 是干嘛的
+        // labeling: 1 用来标识界面是需要标注的，在下面的 fetchData 方法中使用
         History.navigate({ labeling: 1 });
       }
 
@@ -304,7 +305,7 @@ export const AppStore = types
     confirmLabelingConfigured() {
       if (!self.labelingIsConfigured) {
         Modal.confirm({
-          title: "马上就好了",
+          title: "还需要一步操作",
           body:
             "标注数据之前, 需要创建一些配置",
           onOk() {
@@ -343,8 +344,10 @@ export const AppStore = types
       SDK.destroyLSF();
     },
 
+    // 出现 popstate
     handlePopState: (({ state }) => {
-      const { tab, task, annotation, labeling } = state ?? {};
+      console.log('handlePopState state:', state);
+      const { tab, task, annotation, labeling, reviewing } = state ?? {};
 
       if (tab) {
         const tabId = parseInt(tab);
@@ -368,11 +371,14 @@ export const AppStore = types
         self.startLabeling(params, { pushState: false });
       } else if (labeling) {
         self.startLabelStream({ pushState: false });
+      } else if (reviewing) {
+        self.startReviewStream({ pushState: false });
       } else {
         self.closeLabeling({ pushState: false });
       }
     }).bind(self),
 
+    // 通过监听 popstate，
     resolveURLParams() {
       window.addEventListener("popstate", self.handlePopState);
     },
@@ -516,7 +522,7 @@ export const AppStore = types
         },
       };
 
-      if (actionId === "next_task") {
+      if (actionId === "next_task" || actionId === 'next_review') {
         if (labelStreamMode === 'all') {
           delete actionParams.filters;
 
