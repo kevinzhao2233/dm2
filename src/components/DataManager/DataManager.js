@@ -27,6 +27,7 @@ const summaryInjector = inject(({ store }) => {
     totalFoundTasks: taskStore?.total ?? 0,
     totalAnnotations: taskStore?.totalAnnotations ?? 0,
     totalPredictions: taskStore?.totalPredictions ?? 0,
+    totalReviews: taskStore?.totalReviews ?? 0,
     cloudSync: project.target_syncing ?? project.source_syncing ?? false,
   };
 });
@@ -52,12 +53,14 @@ const ProjectSummary = summaryInjector((props) => {
           <Spinner size="small" />
         </Space>
       )}
-      <span style={{ display: "flex", alignItems: "center", fontSize: 12 }}>
+      <span style={{ display: "flex", flexDirection: 'column', alignItems: "end", fontSize: 12 }}>
         <Space size="compact" style={{ gridGap: '8px' }}>
           <span>任务：{props.totalFoundTasks} / {props.totalTasks}</span>
+          <span>预测：{props.totalPredictions}</span>
+        </Space>
+        <Space size="compact" style={{ gridGap: '8px' }}>
           <span>标注结果：{props.totalAnnotations}</span>
           <span>审核：{props.totalReviews}</span>
-          <span>预测：{props.totalPredictions}</span>
         </Space>
       </span>
     </Space>

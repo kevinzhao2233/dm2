@@ -134,6 +134,7 @@ export const create = (columns) => {
     properties: {
       totalAnnotations: 0,
       totalPredictions: 0,
+      totalReviews: 0,
     },
   })
     .actions((self) => ({
@@ -228,16 +229,18 @@ export const create = (columns) => {
       },
 
       postProcessData(data) {
-        const { total_annotations, total_predictions } = data;
+        const { total_annotations, total_predictions, total_reviews } = data;
 
         if (total_annotations !== null)
           self.totalAnnotations = total_annotations;
         if (total_predictions !== null)
           self.totalPredictions = total_predictions;
+        if (total_reviews !== null)
+          self.totalReviews = total_reviews;
       },
     }))
     .preProcessSnapshot((snapshot) => {
-      const { total_annotations, total_predictions, ...sn } = snapshot;
+      const { total_annotations, total_predictions, total_reviews, ...sn } = snapshot;
 
       return {
         ...sn,
@@ -248,6 +251,7 @@ export const create = (columns) => {
         })),
         totalAnnotations: total_annotations,
         totalPredictions: total_predictions,
+        totalReviews: total_reviews,
       };
     });
 };
