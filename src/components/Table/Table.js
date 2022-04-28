@@ -12,7 +12,6 @@ import { Tag } from "../Common/Tag/Tag";
 import { Tooltip } from "../Common/Tooltip/Tooltip";
 import * as CellViews from "./CellViews";
 import { GridView } from "./GridView/GridView";
-import { translatedColumn } from "./Translation";
 import "./Table.styl";
 
 const injector = inject(({ store }) => {
@@ -94,7 +93,7 @@ export const DataView = injector(
 
         if (help && decoration?.help !== false) {
           children.push(
-            <Tooltip key="help-tooltip" title={translatedColumn[original.id]?.help}>
+            <Tooltip key="help-tooltip" title={original.help}>
               <Icon icon={FaQuestionCircle} style={{ opacity: 0.5 }} />
             </Tooltip>,
           );
@@ -167,13 +166,13 @@ export const DataView = injector(
 
       if (column.icon) {
         return (
-          <Tooltip title={(translatedColumn[column.id]?.help || column.help) ?? col.title}>
+          <Tooltip title={(column.help) ?? col.title}>
             {column.icon}
           </Tooltip>
         );
       }
 
-      return translatedColumn[column.id]?.title || column.title;
+      return column.title;
     };
 
     const commonDecoration = useCallback((
@@ -193,6 +192,7 @@ export const DataView = injector(
         commonDecoration("total_annotations", 60, "center"),
         commonDecoration("cancelled_annotations", 60, "center"),
         commonDecoration("total_predictions", 60, "center"),
+        commonDecoration("total_reviews", 60, "center"),
         commonDecoration("completed_at", 180, "space-between", true),
         commonDecoration("reviews_accepted", 60, "center"),
         commonDecoration("reviews_rejected", 60, "center"),

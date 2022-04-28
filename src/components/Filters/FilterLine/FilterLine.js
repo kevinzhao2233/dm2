@@ -8,7 +8,6 @@ import { Tag } from "../../Common/Tag/Tag";
 import { FilterDropdown } from "../FilterDropdown";
 import "./FilterLine.styl";
 import { FilterOperation } from "./FilterOperation";
-import { translatedColumn } from "../../Table/Translation";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -60,7 +59,7 @@ export const FilterLine = observer(({
             onChange={(value) => filter.setFilterDelayed(value)}
             optionRender={({ item: { original: filter } }) => (
               <Elem name="selector">
-                {translatedColumn[filter.field.id]?.title || filter.field.title}
+                {filter.field.title}
                 {filter.field.parent && (
                   <Tag
                     size="small"

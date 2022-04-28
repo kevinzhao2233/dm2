@@ -6,7 +6,6 @@ import {
   ViewColumnTypeShort
 } from "../../../../stores/Tabs/tab_column";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
-import { translatedColumn } from "../../../Table/Translation";
 import { Button } from "../../Button/Button";
 import { Dropdown } from "../../Dropdown/Dropdown";
 import { Menu } from "../../Menu/Menu";
@@ -37,7 +36,7 @@ const DropdownWrapper = observer(
       <Dropdown.Trigger
         content={(
           <Menu
-            title="Display as"
+            title="显示为"
             size="compact"
             selectedKeys={[column.currentType]}
           >
@@ -114,7 +113,7 @@ const ColumnRenderer = observer(
       : null;
     const content = Decoration?.content
       ? Decoration.content(column)
-      : translatedColumn[column.original.id]?.title ?? column.title;
+      : column.title;
 
     const style = getStyle(cellViews, column, Decoration);
 

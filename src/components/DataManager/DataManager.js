@@ -56,6 +56,7 @@ const ProjectSummary = summaryInjector((props) => {
         <Space size="compact" style={{ gridGap: '8px' }}>
           <span>任务：{props.totalFoundTasks} / {props.totalTasks}</span>
           <span>标注结果：{props.totalAnnotations}</span>
+          <span>审核：{props.totalReviews}</span>
           <span>预测：{props.totalPredictions}</span>
         </Space>
       </span>

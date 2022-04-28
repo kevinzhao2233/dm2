@@ -4,7 +4,6 @@ import { Button } from "./Button/Button";
 import { Checkbox } from "./Checkbox/Checkbox";
 import { Dropdown } from "./Dropdown/Dropdown";
 import { Menu } from "./Menu/Menu";
-import { translatedColumn } from "../Table/Translation";
 
 const injector = inject(({ store }) => {
   return {
@@ -18,9 +17,9 @@ const FieldsMenu = observer(
       return (
         <Menu.Item key={col.key} name={col.key} onClick={onClick}>
           {WrapperComponent && col.wra !== false ? (
-            <WrapperComponent column={col}>{translatedColumn[col.id]?.title || col.title}</WrapperComponent>
+            <WrapperComponent column={col}>{col.title}</WrapperComponent>
           ) : (
-            translatedColumn[col.id]?.title || col.title
+            col.title
           )}
         </Menu.Item>
       );
