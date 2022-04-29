@@ -55,6 +55,7 @@ export const create = (columns) => {
     annotations: types.optional(types.array(CustomJSON), []),
     predictions: types.optional(types.array(CustomJSON), []),
     drafts: types.frozen(),
+    history: types.frozen(),
     source: types.maybeNull(types.string),
     was_cancelled: false,
     assigned_task: false,
@@ -148,6 +149,8 @@ export const create = (columns) => {
         self.setLoading(taskID);
 
         const taskData = yield self.root.apiCall("task", { taskID });
+
+        console.log('dm tasks.js loadTask');
 
         const task = self.applyTaskSnapshot(taskData, taskID);
 

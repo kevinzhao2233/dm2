@@ -407,14 +407,11 @@ export class DataManager {
     const taskSelected = this.lsf.task?.id === task?.id;
 
     // 如果已经选择了任务，则不执行任何操作
-    if (taskExists && taskSelected) {
-      return;
-    }
-
+    if (taskExists && taskSelected) return;
+    
     if (!isLabelStream && (!taskSelected || isDefined(annotation))) {
       const annotationID = annotation?.id ?? task.lastAnnotation?.id;
 
-      // this.lsf.loadTask(task.id, annotationID);
       this.lsf.selectTask(task, annotationID);
     }
   }

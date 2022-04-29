@@ -225,13 +225,15 @@ export class LSFWrapper {
 
   /**
    * 选择任务，dm-sdk 中 startLabeling() 调用了
-   * @param {object} 当前选择的任务
-   * @param {*} 最新的 annotationID 
+   * @param {object} task 当前选择的任务
+   * @param {*} annotationID 最新的 annotationID 
    * @param {*} fromHistory 
    */
   selectTask(task, annotationID, fromHistory = false) {
     const needsAnnotationsMerge = task && this.task?.id === task.id;
     const annotations = needsAnnotationsMerge ? [...this.annotations] : [];
+
+    task.annotationHistory = task?.history ?? [];
 
     this.task = task;
 
@@ -240,10 +242,6 @@ export class LSFWrapper {
     }
 
     this.setLoading(false);
-
-    if (task.history) {
-      task.annotationHistory = task.history;
-    }
 
     const lsfTask = taskToLSFormat(task);
 

@@ -27,6 +27,8 @@ export const create = (columns) => {
         });
       }
 
+      console.log('dm annotations.js loadTask');
+
       annotationID = annotationID ?? remoteTask.id;
 
       const annotation = self.updateItem(annotationID, {
