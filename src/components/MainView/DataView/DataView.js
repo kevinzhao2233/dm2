@@ -1,18 +1,19 @@
-import { inject } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FaQuestionCircle } from "react-icons/fa";
-import { useShortcut } from "../../sdk/hotkeys";
-import { Block, Elem } from "../../utils/bem";
-import { Icon } from "../Common/Icon/Icon";
-import { ImportButton } from "../Common/SDKButtons";
-import { Spinner } from "../Common/Spinner";
-import { Table } from "../Common/Table/Table";
-import { Tag } from "../Common/Tag/Tag";
-import { Tooltip } from "../Common/Tooltip/Tooltip";
-import * as CellViews from "./CellViews";
-import { GridView } from "./GridView/GridView";
-import "./Table.styl";
+import { useShortcut } from "../../../sdk/hotkeys";
+import { Block, Elem } from "../../../utils/bem";
+import { Icon } from "../../Common/Icon/Icon";
+import { ImportButton } from "../../Common/SDKButtons";
+import { Spinner } from "../../Common/Spinner";
+import { Table } from "../../Common/Table/Table";
+import { Tag } from "../../Common/Tag/Tag";
+import { Tooltip } from "../../Common/Tooltip/Tooltip";
+import * as CellViews from "../../CellViews";
+import { GridView } from "../GridView/GridView";
+import { getStoredPageSize, Pagination, setStoredPageSize } from "../../Common/Pagination/Pagination";
+import "./DataView.styl";
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
@@ -31,7 +32,7 @@ const injector = inject(({ store }) => {
     total: dataStore?.total ?? 0,
     isLoading: dataStore?.loading ?? true,
     isLocked: currentView?.locked ?? false,
-    hasData: (store.project?.task_count ?? 0) > 0,
+    hasData: (store.project?.task_count ?? store.project?.task_number ?? 0) > 0,
     focusedItem: dataStore?.selected ?? dataStore?.highlighted,
   };
 
@@ -39,7 +40,7 @@ const injector = inject(({ store }) => {
 });
 
 export const DataView = injector(
-  ({
+  observer(({
     store,
     data,
     columns,
@@ -55,15 +56,16 @@ export const DataView = injector(
     isLocked,
     ...props
   }) => {
+    const [currentPageSize, setPageSize] = useState(getStoredPageSize("tasks", 30));
+
+    const setPage = useCallback((page, pageSize) => {
+      setPageSize(pageSize);
+      setStoredPageSize("tasks", pageSize);
+    }, []);
+
     const focusedItem = useMemo(() => {
       return props.focusedItem;
     }, [props.focusedItem]);
-
-    const loadMore = useCallback(() => {
-      if (!dataStore.hasNextPage || dataStore.loading) return;
-
-      dataStore.fetch({ interaction: "scroll" });
-    }, [dataStore]);
 
     const isItemLoaded = useCallback(
       (data, index) => {
@@ -104,11 +106,15 @@ export const DataView = injector(
       [],
     );
 
-    const onSelectAll = useCallback(() => view.selectAll(), [view]);
+    const onSelectAll = useCallback(() => {
+      console.log('selected all');
+      view.selectAll();
+    }, [view]);
 
-    const onRowSelect = useCallback((id) => view.toggleSelected(id), [
-      view,
-    ]);
+    const onRowSelect = useCallback((id) => {
+      console.log('selected row');
+      view.toggleSelected(id);
+    }, [view]);
 
     const onRowClick = useCallback(
       (item, e) => {
@@ -121,42 +127,39 @@ export const DataView = injector(
       [view],
     );
 
-    const renderContent = useCallback(
-      (content) => {
-        if (isLoading && total === 0 && !isLabeling) {
-          return (
-            <Block name="fill-container">
-              <Spinner size="large" />
-            </Block>
-          );
-        } else if (total === 0 || !hasData) {
-          return (
-            <Block name="no-results">
-              <Elem name="description">
-                {hasData ? (
-                  <>
-                    <h3>Nothing found</h3>
+    const renderContent = (content) => {
+      if (isLoading && total === 0 && !isLabeling) {
+        return (
+          <Block name="fill-container">
+            <Spinner size="large" />
+          </Block>
+        );
+      } else if (total === 0 || !hasData) {
+        return (
+          <Block name="no-results">
+            <Elem name="description">
+              {hasData ? (
+                <>
+                  <h3>Nothing found</h3>
                     Try adjusting the filter
-                  </>
-                ) : (
-                  "Looks like you have not imported any data yet"
-                )}
-              </Elem>
-              {!hasData && (
-                <Elem name="navigation">
-                  <ImportButton look="primary" href="./import">
-                    Go to import
-                  </ImportButton>
-                </Elem>
+                </>
+              ) : (
+                "Looks like you have not imported any data yet"
               )}
-            </Block>
-          );
-        }
+            </Elem>
+            {!hasData && (
+              <Elem name="navigation">
+                <ImportButton look="primary" href="./import">
+                    Go to import
+                </ImportButton>
+              </Elem>
+            )}
+          </Block>
+        );
+      }
 
-        return content;
-      },
-      [hasData, isLabeling, isLoading, total],
-    );
+      return content;
+    };
 
     const decorationContent = (col) => {
       const column = col.original;
@@ -222,7 +225,6 @@ export const DataView = injector(
           data={data}
           rowHeight={70}
           total={total}
-          loadMore={loadMore}
           fitContent={isLabeling}
           columns={columns}
           hiddenColumns={hiddenColumns}
@@ -251,7 +253,6 @@ export const DataView = injector(
           view={view}
           data={data}
           fields={columns}
-          loadMore={loadMore}
           onChange={(id) => view.toggleSelected(id)}
           hiddenFields={hiddenColumns}
           stopInteractions={isLocked}
@@ -284,15 +285,43 @@ export const DataView = injector(
       if (highlighted && !highlighted.isSelected) store.startLabeling(highlighted);
     });
 
-    // Render the UI for your table
+    // Render the UI for the table
     return (
       <Block
         name="data-view"
         className="dm-content"
-        style={{ pointerEvents: isLocked ? "none" : "auto" }}
+        mod={{ loading: dataStore.loading, locked: isLocked }}
       >
         {renderContent(content)}
+
+        {store.mode !== "labelstream" && (
+          <Elem name="footer">
+            <Pagination
+              alwaysVisible
+              label="Tasks"
+              urlParamName="page"
+              page={dataStore.page ?? 1}
+              totalItems={total}
+              showTitle={!isLabeling}
+              showPageSize={!isLabeling}
+              size={isLabeling ? "small" : "medium"}
+              waiting={dataStore.loading}
+              deafultPageSize={currentPageSize}
+              pageSizeOptions={[10, 30, 50, 100]}
+              onInit={setPage}
+              onChange={setPage}
+              onPageLoad={async (page, pageSize) => {
+                if (page !== dataStore.page || pageSize !== dataStore.pageSize) {
+                  await dataStore.fetch({
+                    pageNumber: page,
+                    pageSize,
+                  });
+                }
+              }}
+            />
+          </Elem>
+        )}
       </Block>
     );
-  },
+  }),
 );
