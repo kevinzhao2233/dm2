@@ -279,6 +279,7 @@ export class LSFWrapper {
         cs.selectAnnotation(c.id);
         c.deserializeResults(draft.result);
         c.setDraftId(draft.id);
+        c.setDraftSaved(draft.created_at);
         c.history.safeUnfreeze();
       }
     }
@@ -449,6 +450,8 @@ export class LSFWrapper {
     const { task } = this;
     let response;
 
+    task.deleteAnnotation(annotation);
+
     if (annotation.userGenerate && annotation.sentUserGenerate === false) {
       if (annotation.draftId) {
         response = await this.deleteDraft(annotation.draftId);
@@ -500,15 +503,16 @@ export class LSFWrapper {
     }
   };
 
-  onSkipTask = async () => {
+  onSkipTask = async (_, { comment } = {}) => {
     await this.submitCurrentAnnotation(
       "skipTask",
       (taskID, body) => {
         const { id, ...annotation } = body;
-        const params = { taskID, annotationID: id };
+        const params = { taskID };
         const options = { body: annotation };
 
         options.body.was_cancelled = true;
+        if (comment) options.body.comment = comment;
 
         if (id === undefined) {
           return this.datamanager.apiCall("submitAnnotation", params, options);
